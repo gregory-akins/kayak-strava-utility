@@ -1,4 +1,3 @@
-
 declare module "*.html" {
   const rawHtmlFile: string;
   export = rawHtmlFile;
@@ -38,4 +37,3 @@ declare module "*.svg" {
   const src: string;
   export default src;
 }
-
