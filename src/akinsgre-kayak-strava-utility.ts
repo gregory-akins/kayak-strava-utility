@@ -19,9 +19,9 @@ export const authenticate = async (
 ) => {
   try {
     // If not redirected to Strava, return to home
-    if (_.isEmpty(path)) {
-      return "/";
-    }
+    // if (_.isEmpty(path)) {
+    //   return "/";
+    // }
 
     // Save the Auth Token to the Store (it's located under 'search' for some reason)
     const stravaAuthToken = cleanUpAuthToken(location.search);
@@ -33,11 +33,11 @@ export const authenticate = async (
       REACT_APP_CLIENT_SECRET
     );
 
-    //props.setUser(tokens);
     const accessToken = tokens.access_token;
-
     const userID = tokens.athlete.id;
+
     localStorage.setItem("athlete", tokens.athlete.username);
+    localStorage.setItem("accessToken", accessToken.toLocaleString());
     // Axios request to get users info
     const user = await getUserData(userID, accessToken);
     //props.setUserActivities(user);
@@ -52,7 +52,7 @@ export const authenticate = async (
 const cleanUpAuthToken = (str) => {
   return str.split("&")[1].slice(5);
 };
-const testAuthGetter = async (
+export const testAuthGetter = async (
   authTok,
   REACT_APP_CLIENT_ID,
   REACT_APP_CLIENT_SECRET

@@ -1,5 +1,7 @@
 {
-  "name": "@insomnia/kayak-strava-utility",
+  "name": "@akinsgre/kayak-strava-utility",
+  "version": "0.0.2",
+  "license": "MIT",
   "scripts": {
     "start": "webpack serve --port 8502",
     "start:standalone": "webpack serve --env standalone",
@@ -52,5 +54,5 @@
     "lodash": "^4.17.21",
     "single-spa": "^5.9.3"
   },
-  "types": "dist/insomnia-kayak-strava-utility.d.ts"
+  "types": "dist/akinsgre-kayak-strava-utility.d.ts"
 }

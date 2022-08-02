@@ -1,6 +1,6 @@
 {
   "extends": "ts-config-single-spa",
-  "files": ["src/insomnia-kayak-strava-utility.ts"],
+  "files": ["src/akinsgre-kayak-strava-utility.ts"],
   "compilerOptions": {
     "declarationDir": "dist"
   },

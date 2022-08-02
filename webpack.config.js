@@ -3,7 +3,7 @@ const singleSpaDefaults = require("webpack-config-single-spa-ts");
 
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({
-    orgName: "insomnia",
+    orgName: "akinsgre",
     projectName: "kayak-strava-utility",
     webpackConfigEnv,
     argv,
