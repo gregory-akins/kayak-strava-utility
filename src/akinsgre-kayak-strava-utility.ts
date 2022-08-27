@@ -32,16 +32,13 @@ export const authenticate = async (
       REACT_APP_CLIENT_ID,
       REACT_APP_CLIENT_SECRET
     );
-
     const accessToken = tokens.access_token;
     const userID = tokens.athlete.id;
 
-    localStorage.setItem("athlete", tokens.athlete.username);
+    localStorage.setItem("username", tokens.athlete.username);
     localStorage.setItem("accessToken", accessToken.toLocaleString());
     // Axios request to get users info
     const user = await getUserData(userID, accessToken);
-    //props.setUserActivities(user);
-
     // Once complete, go to display page
     return "/yourdistance";
   } catch (error) {
