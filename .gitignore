@@ -35,6 +35,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+# SO we don't accidentally add npm install artifacts
+package-lock.json
 
 # TypeScript v1 declaration files
 typings/
