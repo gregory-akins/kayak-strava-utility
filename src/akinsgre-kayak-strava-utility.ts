@@ -2,6 +2,24 @@ import axios from "axios";
 import { Token } from "./types/Token";
 import _ from "lodash";
 
+export interface ServiceConfig {
+  stravaUrl: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUrl: string;
+}
+
+export async function useServiceConfig(): Promise<ServiceConfig> {
+  const serviceConfig: ServiceConfig = (
+    await axios.get<ServiceConfig>("/importmap/config.json")
+  ).data;
+
+  if (!serviceConfig?.stravaUrl) {
+    throw new Error("Invalid Strava URL Config");
+  }
+  return serviceConfig;
+}
+
 export const getUserData = async (userID, accessToken) => {
   try {
     const response = await axios.get(
