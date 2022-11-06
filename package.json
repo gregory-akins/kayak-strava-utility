@@ -54,5 +54,8 @@
     "lodash": "^4.17.21",
     "single-spa": "^5.9.3"
   },
+  "overrides":{
+    "loader-utils@2.0.0": "2.0.3"
+  },
   "types": "dist/akinsgre-kayak-strava-utility.d.ts"
 }
