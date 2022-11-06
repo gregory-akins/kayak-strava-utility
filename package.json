@@ -43,7 +43,7 @@
     "typescript": "^4.3.5",
     "webpack": "^5.51.1",
     "webpack-cli": "^4.8.0",
-    "webpack-config-single-spa-ts": "^5.2.0",
+    "webpack-config-single-spa-ts": "^4.1.2",
     "webpack-dev-server": "^4.0.0",
     "webpack-merge": "^5.8.0"
   },
