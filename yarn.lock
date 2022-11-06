@@ -5775,7 +5775,7 @@ webpack-cli@^4.8.0:
     rechoir "^0.7.0"
     webpack-merge "^5.7.3"
 
-webpack-config-single-spa-ts@^4.0.0:
+webpack-config-single-spa-ts@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/webpack-config-single-spa-ts/-/webpack-config-single-spa-ts-4.1.2.tgz#5eb4f1b1a2c96de323c8dbb912c0798c7db2df0c"
   integrity sha512-H7INbFQgu9+H0IAOqsQNw/GljxWDdzwyEoyDJ4818V5RATm7IvcNKBuxEKilKK/LvgVeXB+29ZOOrqowSxBiFQ==
