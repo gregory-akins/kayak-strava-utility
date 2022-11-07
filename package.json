@@ -1,6 +1,6 @@
 {
   "name": "@akinsgre/kayak-strava-utility",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "scripts": {
     "start": "webpack serve --port 8502",
