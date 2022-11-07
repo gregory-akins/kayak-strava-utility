@@ -1,6 +1,6 @@
 {
   "name": "@akinsgre/kayak-strava-utility",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
   "scripts": {
     "start": "webpack serve --port 8502",
@@ -32,7 +32,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-ts-important-stuff": "^1.1.0",
     "eslint-plugin-prettier": "^3.4.1",
-    "husky": "^7.0.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.0.6",
     "jest-cli": "^27.0.6",
@@ -52,7 +51,8 @@
     "@types/systemjs": "^6.1.1",
     "@types/webpack-env": "^1.16.2",
     "lodash": "^4.17.21",
-    "single-spa": "^5.9.3"
+    "single-spa": "^5.9.3",
+    "husky": "^7.0.2"
   },
   "overrides": {
     "loader-utils@2.0.0": "2.0.3"
