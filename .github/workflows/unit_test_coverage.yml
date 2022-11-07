@@ -1,0 +1,59 @@
+# This workflow will do the following:
+# - perform a clean install of node dependencies
+# - lint the source code for errors
+# - build the source code
+# - run tests and capture code coverage
+# - run end-to-end tests
+# - upload the code coverage report to Codacy
+# - upload the code coverage report to Codecov
+
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Checkout, install, lint, build and test with coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: 14.x
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install node dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Audit dependencies for security vulnerabilities
+        run: yarn audit
+
+      - name: Lint the source code
+        run: yarn lint
+
+      - name: Check prettier formatting
+        run: yarn check-format
+
+      - name: Build the source code
+        run: yarn build
+
+      - name: Execute test coverage
+        run: yarn coverage
