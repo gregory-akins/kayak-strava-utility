@@ -12,46 +12,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v2-beta
-        with:
-          node-version: 14.x
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Install node dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Audit dependencies for security vulnerabilities
-        run: yarn audit
-
-      - name: Lint the source code
-        run: yarn lint
-
-      - name: Check prettier formatting
-        run: yarn check-format
-
-      - name: Build the source code
+      - name: Build
         run: yarn build
 
-      - name: Execute test coverage
-        run: yarn coverage
+      - name: Copy & Package for npm publish
+        run: cp package.json dist/
 
       - name: Publish if version has been updated
         uses: pascalgn/npm-publish-action@master
         with: # All of theses inputs are optional
           tag_name: "v%s"
           tag_message: "v%s"
+          create_tag: "true"
+          workspace: "./dist"
           commit_pattern: "[\\s\\S]*Release (\\S+)"
           publish_args: " --access public"
         env: # More info about the environment variables in the README
