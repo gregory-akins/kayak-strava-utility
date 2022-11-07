@@ -53,10 +53,7 @@ jobs:
         run: yarn check-format
 
       - name: Build the source code
-        run:  yarn build
+        run: yarn build
 
       - name: Execute test coverage
         run: yarn coverage
-
-
-
