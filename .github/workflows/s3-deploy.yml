@@ -11,21 +11,11 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v3
-
       - name: Install node dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Audit dependencies for security vulnerabilities
-        run: yarn audit
-
-      - name: Lint the source code
-        run: yarn lint
-
-      - name: Check prettier formatting
-        run: yarn check-format
+        run: npm ci
 
       - name: Build
-        run: yarn build
+        run: npm run build
 
       - name: Deploy
         uses: reggionick/s3-deploy@v3

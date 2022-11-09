@@ -30,13 +30,10 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install node dependencies
-        run: yarn prepare
-
-      - name: Install node dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Build
-        run: yarn build
+        run: npm run build
 
       - name: Copy & Package for npm publish
         run: cp package.json dist/ && ls -l dist
@@ -49,7 +46,6 @@ jobs:
           create_tag: "true"
           workspace: "./dist"
           commit_pattern: "[\\s\\S]*Release (\\S+)"
-          publish_command: "yarn"
           publish_args: " --access public"
         env: # More info about the environment variables in the README
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this as is, it's automatically generated
