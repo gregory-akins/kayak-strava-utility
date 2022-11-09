@@ -4,8 +4,6 @@
 # - build the source code
 # - run tests and capture code coverage
 # - run end-to-end tests
-# - upload the code coverage report to Codacy
-# - upload the code coverage report to Codecov
 
 name: Continuous Integration
 
@@ -52,8 +50,8 @@ jobs:
       - name: Check prettier formatting
         run: npm run check-format
 
-      - name: Build the source code
-        run: npm run build
-
       - name: Execute test coverage
         run: npm run coverage
+
+      - name: Build the source code
+        run: npm run build
