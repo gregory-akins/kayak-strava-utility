@@ -30,6 +30,9 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install node dependencies
+        run: yarn prepare
+
+      - name: Install node dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build
