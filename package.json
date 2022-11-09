@@ -58,5 +58,7 @@
   "overrides": {
     "loader-utils@2.0.0": "2.0.3"
   },
+  "files": ["dist/**"],
+  "main": "dist/akinsgre-kayak-strava-utility.js",
   "types": "dist/akinsgre-kayak-strava-utility.d.ts"
 }
