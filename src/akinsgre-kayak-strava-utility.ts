@@ -20,13 +20,12 @@ export async function useServiceConfig(): Promise<ServiceConfig> {
   return serviceConfig;
 }
 
-export const getUserData = async (userID, accessToken) => {
+export const getUserData = (userID: number, accessToken: number): void => {
   try {
-    const response = await axios.get(
+    const response = axios.get(
       `https://www.strava.com/api/v3/athletes/${userID}/stats`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
-    return response;
   } catch (error) {}
 };
 
