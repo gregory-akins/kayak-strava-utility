@@ -1,9 +1,9 @@
 {
   "name": "@akinsgre/kayak-strava-utility",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "license": "MIT",
   "scripts": {
-    "start": "webpack serve --port 8502",
+    "start": "webpack serve --env development --port 8502",
     "start:standalone": "webpack serve --env standalone",
     "clean": "rm -rf ./dist",
     "build": "concurrently npm:build:*",
@@ -29,6 +29,7 @@
     "babel-jest": "^27.0.6",
     "concurrently": "^6.2.1",
     "cross-env": "^7.0.3",
+    "dotenv-webpack": "^8.0.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-ts-important-stuff": "^1.1.0",

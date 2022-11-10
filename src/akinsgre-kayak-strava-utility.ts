@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Token } from "./types/Token";
 import _ from "lodash";
-
+axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 export interface ServiceConfig {
   stravaUrl: string;
   clientId: string;
@@ -10,6 +10,9 @@ export interface ServiceConfig {
 }
 
 export async function useServiceConfig(): Promise<ServiceConfig> {
+  /* eslint-disable no-console */
+  console.log("Base URL", axios.defaults.baseURL);
+  /* eslint-enable no-console */
   const serviceConfig: ServiceConfig = (
     await axios.get<ServiceConfig>("/importmap/config.json")
   ).data;
