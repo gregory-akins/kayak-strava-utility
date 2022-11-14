@@ -10,9 +10,6 @@ export interface ServiceConfig {
 }
 
 export async function useServiceConfig(): Promise<ServiceConfig> {
-  /* eslint-disable no-console */
-  console.log("Base URL", axios.defaults.baseURL);
-  /* eslint-enable no-console */
   const serviceConfig: ServiceConfig = (
     await axios.get<ServiceConfig>("/importmap/config.json")
   ).data;
@@ -34,28 +31,28 @@ export const getUserData = (userID: number, accessToken: number): void => {
 
 export const authenticate = async (
   path: string,
-  REACT_APP_CLIENT_ID: string,
-  REACT_APP_CLIENT_SECRET: string
-) => {
+  clientId: string,
+  clientSecret: string
+): Promise<string> => {
   try {
-    // If not redirected to Strava, return to home
     // if (_.isEmpty(path)) {
     //   return "/";
     // }
 
     // Save the Auth Token to the Store (it's located under 'search' for some reason)
     const stravaAuthToken = cleanUpAuthToken(location.search);
-
-    // Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
-    const tokens = await testAuthGetter(
+    //Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
+    const token: Token = await testAuthGetter(
       stravaAuthToken,
-      REACT_APP_CLIENT_ID,
-      REACT_APP_CLIENT_SECRET
+      clientId,
+      clientSecret
     );
-    const accessToken = tokens.access_token;
-    const userID = tokens.athlete.id;
+    //why aren't we waiting on this?
 
-    localStorage.setItem("username", tokens.athlete.username);
+    const accessToken = token.access_token;
+    const userID = token.athlete.id;
+
+    localStorage.setItem("username", token.athlete.username);
     localStorage.setItem("accessToken", accessToken.toLocaleString());
     // Axios request to get users info
     const user = await getUserData(userID, accessToken);
@@ -74,10 +71,16 @@ export const testAuthGetter = async (
   REACT_APP_CLIENT_ID,
   REACT_APP_CLIENT_SECRET
 ): Promise<Token> => {
+  let retVal: Token;
   try {
-    const response = await axios.post(
-      `https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`
-    );
-    return response.data;
+    const response = await axios
+      .post(
+        `https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`
+      )
+      .then(async (response) => {
+        retVal = response.data;
+      })
+      .catch(() => console.error);
+    return retVal;
   } catch (error) {}
 };
