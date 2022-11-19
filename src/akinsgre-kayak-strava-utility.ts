@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import { Token } from "./types/Token";
 import _ from "lodash";
 axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
@@ -51,9 +52,8 @@ export const authenticate = async (
 
     const accessToken = token.access_token;
     const userID = token.athlete.id;
-
-    localStorage.setItem("username", token.athlete.username);
-    localStorage.setItem("accessToken", accessToken.toLocaleString());
+    sessionStorage.setItem("userName", JSON.stringify(token.athlete));
+    sessionStorage.setItem("accessToken", accessToken.toLocaleString());
     // Axios request to get users info
     const user = await getUserData(userID, accessToken);
     // Once complete, go to display page
