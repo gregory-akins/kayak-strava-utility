@@ -1,7 +1,8 @@
 import axios from "axios";
 
-import { Token } from "./types/Token";
+import { Athlete, Token } from "./types/Token";
 import _ from "lodash";
+import { clearConfigCache } from "prettier";
 axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 export interface ServiceConfig {
   stravaUrl: string;
@@ -21,66 +22,77 @@ export async function useServiceConfig(): Promise<ServiceConfig> {
   return serviceConfig;
 }
 
-export const getUserData = (userID: number, accessToken: number): void => {
-  try {
-    const response = axios.get(
-      `https://www.strava.com/api/v3/athletes/${userID}/stats`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-  } catch (error) {}
+export const getUserData = async (
+  userID: number,
+  accessToken: number
+): Promise<Athlete> => {
+  const response = await axios.get(
+    `https://www.strava.com/api/v3/athletes/${userID}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  const result: Athlete = {
+    firstname: response.data.firstname,
+    lastname: response.data.lastname,
+    username: response.data.username,
+    id: response.data.id,
+  };
+  return result;
 };
 
 export const authenticate = async (
-  path: string,
   clientId: string,
   clientSecret: string
-): Promise<string> => {
+): Promise<Athlete> => {
   try {
     // if (_.isEmpty(path)) {
     //   return "/";
     // }
 
     // Save the Auth Token to the Store (it's located under 'search' for some reason)
-    const stravaAuthToken = cleanUpAuthToken(location.search);
-    //Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
-    const token: Token = await testAuthGetter(
-      stravaAuthToken,
-      clientId,
-      clientSecret
-    );
-    //why aren't we waiting on this?
 
-    const accessToken = token.access_token;
-    const userID = token.athlete.id;
-    sessionStorage.setItem("userName", JSON.stringify(token.athlete));
-    sessionStorage.setItem("accessToken", accessToken.toLocaleString());
-    // Axios request to get users info
-    const user = await getUserData(userID, accessToken);
-    // Once complete, go to display page
-    return "/yourdistance";
+    if (!location.search || location.search.split("&").length < 2) {
+      return undefined;
+    } else {
+      const stravaAuthToken = cleanUpAuthToken(location.search);
+      //Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
+      const token: Token = await testAuthGetter(
+        stravaAuthToken,
+        clientId,
+        clientSecret
+      );
+      const accessToken = token.access_token;
+      sessionStorage.setItem("userName", JSON.stringify(token.athlete));
+      sessionStorage.setItem("accessToken", accessToken.toLocaleString());
+      const user: Athlete = await getUserData(token.athlete.id, accessToken);
+
+      return user;
+    }
   } catch (error) {
-    return "/";
+    return undefined;
   }
 };
 
 const cleanUpAuthToken = (str) => {
-  return str.split("&")[1].slice(5);
+  var search = str.substring(1);
+  const param = JSON.parse(
+    '{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+    function (key, value) {
+      return key === "" ? value : decodeURIComponent(value);
+    }
+  );
+  return param["code"];
 };
+
 export const testAuthGetter = async (
   authTok,
-  REACT_APP_CLIENT_ID,
-  REACT_APP_CLIENT_SECRET
+  clientId,
+  clientSecret
 ): Promise<Token> => {
-  let retVal: Token;
   try {
-    const response = await axios
-      .post(
-        `https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`
-      )
-      .then(async (response) => {
-        retVal = response.data;
-      })
-      .catch(() => console.error);
+    const response = await axios.post(
+      `https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${authTok}&grant_type=authorization_code`
+    );
+    const retVal: Token = response.data;
     return retVal;
   } catch (error) {}
 };

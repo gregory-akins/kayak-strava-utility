@@ -6,4 +6,6 @@ export interface Token {
 export interface Athlete {
   id: number;
   username: string;
+  firstname: string;
+  lastname: string;
 }
