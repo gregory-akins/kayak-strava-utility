@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { Athlete, Token } from "./types/Token";
 import _ from "lodash";
-import { clearConfigCache } from "prettier";
+import Cookies from "js-cookie";
 axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 export interface ServiceConfig {
   stravaUrl: string;
@@ -55,17 +55,26 @@ export const authenticate = async (
     } else {
       const stravaAuthToken = cleanUpAuthToken(location.search);
       //Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
+
       const token: Token = await testAuthGetter(
         stravaAuthToken,
         clientId,
         clientSecret
       );
       const accessToken = token.access_token;
-      sessionStorage.setItem("userName", JSON.stringify(token.athlete));
-      sessionStorage.setItem("accessToken", accessToken.toLocaleString());
-      const user: Athlete = await getUserData(token.athlete.id, accessToken);
 
-      return user;
+      sessionStorage.setItem("accessToken", accessToken.toLocaleString());
+      Cookies.set("token", JSON.stringify(token));
+
+      const user: Athlete = {
+        firstname: token.athlete.firstname,
+        lastname: token.athlete.lastname,
+        username: token.athlete.username,
+        id: token.athlete.id,
+      } as Athlete;
+      return new Promise((resolve, reject) => {
+        resolve(user);
+      });
     }
   } catch (error) {
     return undefined;
@@ -92,7 +101,14 @@ export const testAuthGetter = async (
     const response = await axios.post(
       `https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${authTok}&grant_type=authorization_code`
     );
-    const retVal: Token = response.data;
+
+    const retVal: Token = {
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
+      expiry: response.data.expires_at,
+      athlete: response.data.athlete,
+    };
+
     return retVal;
   } catch (error) {}
 };
