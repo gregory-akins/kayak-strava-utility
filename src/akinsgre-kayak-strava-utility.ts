@@ -16,7 +16,7 @@ export async function useServiceConfig(): Promise<ServiceConfig> {
     await axios.get<ServiceConfig>("/importmap/config.json")
   ).data;
 
-  if (!serviceConfig?.stravaUrl) {
+  if (!serviceConfig?.stravaUrl || serviceConfig.stravaUrl.length === 0) {
     throw new Error("Invalid Strava URL Config");
   }
   return serviceConfig;
@@ -27,10 +27,6 @@ export const authenticate = async (
   clientSecret: string
 ): Promise<Athlete> => {
   try {
-    // if (_.isEmpty(path)) {
-    //   return "/";
-    // }
-
     // Save the Auth Token to the Store (it's located under 'search' for some reason)
 
     if (!location.search || location.search.split("&").length < 2) {
@@ -44,6 +40,7 @@ export const authenticate = async (
         clientId,
         clientSecret
       );
+
       const accessToken = token.access_token;
 
       sessionStorage.setItem("accessToken", accessToken.toLocaleString());
@@ -75,7 +72,7 @@ const cleanUpAuthToken = (str) => {
   return param["code"];
 };
 
-export const testAuthGetter = async (
+const testAuthGetter = async (
   authTok,
   clientId,
   clientSecret
