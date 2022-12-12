@@ -1,6 +1,6 @@
 export interface Token {
-  access_token: number;
-  refresh_token: number;
+  access_token: string;
+  refresh_token: string;
   expiry: Date;
   athlete: Athlete;
 }
