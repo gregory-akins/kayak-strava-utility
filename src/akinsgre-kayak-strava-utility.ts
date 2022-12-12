@@ -15,7 +15,6 @@ export async function useServiceConfig(): Promise<ServiceConfig> {
   const serviceConfig: ServiceConfig = (
     await axios.get<ServiceConfig>("/importmap/config.json")
   ).data;
-
   if (!serviceConfig?.stravaUrl || serviceConfig.stravaUrl.length === 0) {
     throw new Error("Invalid Strava URL Config");
   }
@@ -41,10 +40,7 @@ export const authenticate = async (
         clientSecret
       );
 
-      const accessToken = token.access_token;
-
-      sessionStorage.setItem("accessToken", accessToken.toLocaleString());
-      Cookies.set("token", JSON.stringify(token));
+      persistToken(token);
 
       const user: Athlete = {
         firstname: token.athlete.firstname,
@@ -92,3 +88,30 @@ const testAuthGetter = async (
     return retVal;
   } catch (error) {}
 };
+
+export const refreshAuth = async (): Promise<Token> => {
+  const token: Token = JSON.parse(Cookies.get<Token>("token"));
+  const refreshToken: string = token.refresh_token;
+  if (!refreshToken) {
+    return null;
+  }
+  try {
+    const serviceConfig: ServiceConfig = await useServiceConfig();
+    const response = await axios.post(
+      `https://www.strava.com/api/v3/oauth/token?client_id=${serviceConfig.clientId}&client_secret=${serviceConfig.clientSecret}&refreshToken=${refreshToken}&grant_type=refresh_token`
+    );
+    const retVal: Token = {
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
+      expiry: response.data.expires_at,
+      athlete: response.data.athlete,
+    };
+    persistToken(retVal);
+    return retVal;
+  } catch (error) {}
+};
+function persistToken(token: Token) {
+  const accessToken = token.access_token;
+  sessionStorage.setItem("accessToken", accessToken.toLocaleString());
+  Cookies.set("token", JSON.stringify(token));
+}
