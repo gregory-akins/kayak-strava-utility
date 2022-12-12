@@ -2,6 +2,7 @@ import {
   useServiceConfig,
   ServiceConfig,
   authenticate,
+  refreshAuth,
 } from "./akinsgre-kayak-strava-utility";
 import { Athlete, Token } from "./types/Token";
 
@@ -47,14 +48,14 @@ describe("Service Config", () => {
     it("should authenticate", async () => {
       expect.assertions(1);
       const config: ServiceConfig = {
-        stravaUrl: "",
+        stravaUrl: "http://strava.com",
         clientId: "58115",
         clientSecret: "",
         redirectUrl: "http://localhost:9000/",
       };
       const retVal: Token = {
-        access_token: 123123,
-        refresh_token: 456456,
+        access_token: "123123",
+        refresh_token: "456456",
         expiry: new Date(),
         athlete: { firstname: "Greg", lastname: "Akins" } as Athlete,
       };
@@ -66,6 +67,34 @@ describe("Service Config", () => {
 
       const data = await authenticate("58115", "dummysecret");
       expect(data.firstname).toBe("Greg");
+    });
+  });
+  describe("refreshAuth", () => {
+    it("should get a new token", async () => {
+      const config: ServiceConfig = {
+        stravaUrl: "http://strava.com",
+        clientId: "58115",
+        clientSecret: "",
+        redirectUrl: "http://localhost:9000/",
+      };
+      const retVal: Token = {
+        access_token: "123123",
+        refresh_token: "456456",
+        expiry: new Date(),
+        athlete: { firstname: "Greg", lastname: "Akins" } as Athlete,
+      };
+      const resp = { data: config };
+      (axios.get as jest.Mock).mockResolvedValue(resp);
+
+      Object.defineProperty(window.document, "cookie", {
+        writable: true,
+        value: `token=${JSON.stringify(retVal)}`,
+      });
+
+      (axios.post as jest.Mock).mockResolvedValue({ data: retVal });
+
+      const data = await refreshAuth();
+      expect(data.refresh_token).toBe("456456");
     });
   });
 });
