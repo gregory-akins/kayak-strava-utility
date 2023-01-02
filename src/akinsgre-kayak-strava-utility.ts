@@ -98,8 +98,9 @@ export const refreshAuth = async (): Promise<Token> => {
   try {
     const serviceConfig: ServiceConfig = await useServiceConfig();
     const response = await axios.post(
-      `https://www.strava.com/api/v3/oauth/token?client_id=${serviceConfig.clientId}&client_secret=${serviceConfig.clientSecret}&refreshToken=${refreshToken}&grant_type=refresh_token`
+      `${serviceConfig.stravaUrl}/oauth/token?client_id=${serviceConfig.clientId}&client_secret=${serviceConfig.clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
     );
+
     const retVal: Token = {
       access_token: response.data.access_token,
       refresh_token: response.data.refresh_token,
@@ -110,6 +111,29 @@ export const refreshAuth = async (): Promise<Token> => {
     return retVal;
   } catch (error) {}
 };
+
+export const getAthlete = async (accessToken: string): Promise<Athlete> => {
+  try {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const serviceConfig: ServiceConfig = await useServiceConfig();
+    const response = axios.get(`${serviceConfig.stravaUrl}/athlete`);
+    const retVal: Athlete = {} as unknown as Athlete;
+    return new Promise((resolve, reject) => {
+      response
+        .then((data) => {
+          const athlete: Athlete = {
+            firstname: data.data.firstname,
+            lastname: data.data.lastname,
+          } as unknown as Athlete;
+          resolve(athlete);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  } catch (error) {}
+};
+
 function persistToken(token: Token) {
   const accessToken = token.access_token;
   sessionStorage.setItem("accessToken", accessToken.toLocaleString());
