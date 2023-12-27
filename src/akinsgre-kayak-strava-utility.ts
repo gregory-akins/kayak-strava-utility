@@ -1,13 +1,12 @@
-import axios from "axios";
-
 import { Athlete, Token } from "./types/Token";
 import _ from "lodash";
 import Cookies from "js-cookie";
-axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
+import axios from "axios";
+
 export interface ServiceConfig {
   stravaUrl: string;
+  kayakStravaUrl: string;
   clientId: string;
-  clientSecret: string;
   redirectUrl: string;
 }
 
@@ -21,27 +20,18 @@ export async function useServiceConfig(): Promise<ServiceConfig> {
   return serviceConfig;
 }
 
-export const authenticate = async (
-  clientId: string,
-  clientSecret: string
-): Promise<Athlete> => {
+export const authenticate = async (): Promise<Athlete> => {
   try {
     // Save the Auth Token to the Store (it's located under 'search' for some reason)
 
     if (!location.search || location.search.split("&").length < 2) {
       return undefined;
     } else {
-      const stravaAuthToken = cleanUpAuthToken(location.search);
+      const stravaAuthToken: string = cleanUpAuthToken(location.search);
       //Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
 
-      const token: Token = await testAuthGetter(
-        stravaAuthToken,
-        clientId,
-        clientSecret
-      );
-
+      const token: Token = await getStravaAuth(stravaAuthToken);
       persistToken(token);
-
       const user: Athlete = {
         firstname: token.athlete.firstname,
         lastname: token.athlete.lastname,
@@ -68,46 +58,46 @@ const cleanUpAuthToken = (str) => {
   return param["code"];
 };
 
-const testAuthGetter = async (
-  authTok,
-  clientId,
-  clientSecret
-): Promise<Token> => {
+const getStravaAuth = async (authTok: string): Promise<Token> => {
   try {
-    const response = await axios.post(
-      `https://www.strava.com/api/v3/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${authTok}&grant_type=authorization_code`
+    const serviceConfig: ServiceConfig = await useServiceConfig();
+    const { data } = await axios.post(
+      `${serviceConfig.kayakStravaUrl}/getauth?code=${authTok}`,
+      {}
     );
-
     const retVal: Token = {
-      access_token: response.data.access_token,
-      refresh_token: response.data.refresh_token,
-      expiry: response.data.expires_at,
-      athlete: response.data.athlete,
+      access_token: data.body.access_token,
+      refresh_token: data.body.refresh_token,
+      expiry: data.body.expires_at,
+      athlete: data.body.athlete,
     };
 
     return retVal;
   } catch (error) {}
 };
 
-export const refreshAuth = async (): Promise<Token> => {
+export const refreshStravaAuth = async (): Promise<Token> => {
   const token: Token = JSON.parse(Cookies.get<Token>("token"));
   const refreshToken: string = token.refresh_token;
-  if (!refreshToken) {
+
+  const authTok: string = token.access_token;
+
+  if (!refreshToken && token.expiry < Math.floor(Date.now() / 1000)) {
     return null;
   }
   try {
     const serviceConfig: ServiceConfig = await useServiceConfig();
-    const response = await axios.post(
-      `${serviceConfig.stravaUrl}/oauth/token?client_id=${serviceConfig.clientId}&client_secret=${serviceConfig.clientSecret}&refresh_token=${refreshToken}&grant_type=refresh_token`
-    );
+    const refreshUrl: string = `${serviceConfig.kayakStravaUrl}/refreshauth?refreshToken=${refreshToken}&code=${authTok}`;
+
+    const { data } = await axios.post(refreshUrl, {});
 
     const retVal: Token = {
-      access_token: response.data.access_token,
-      refresh_token: response.data.refresh_token,
-      expiry: response.data.expires_at,
-      athlete: response.data.athlete,
+      access_token: data.body.access_token,
+      refresh_token: data.body.refresh_token,
+      expiry: data.body.expires_at,
+      athlete: data.body.athlete,
     };
-    persistToken(retVal);
+    if (retVal) persistToken(retVal);
     return retVal;
   } catch (error) {}
 };
