@@ -5,5 +5,6 @@ module.exports = {
   },
   moduleNameMapper: {
     "\\.(css)$": "identity-obj-proxy",
+    axios: "axios/dist/node/axios.cjs",
   },
 };

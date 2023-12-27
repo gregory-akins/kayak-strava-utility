@@ -1,9 +1,8 @@
-import axios from "axios";
-
 import { Athlete, Token } from "./types/Token";
 import _ from "lodash";
 import Cookies from "js-cookie";
-axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
+import axios from "axios";
+
 export interface ServiceConfig {
   stravaUrl: string;
   kayakStravaUrl: string;
