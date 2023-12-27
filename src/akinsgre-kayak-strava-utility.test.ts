@@ -2,7 +2,7 @@ import {
   useServiceConfig,
   ServiceConfig,
   authenticate,
-  refreshAuth,
+  refreshStravaAuth,
 } from "./akinsgre-kayak-strava-utility";
 import { Athlete, Token } from "./types/Token";
 
@@ -16,8 +16,8 @@ describe("Service Config", () => {
     const config: ServiceConfig = {
       stravaUrl: "https://www.strava.com/api/v3",
       clientId: "58115",
-      clientSecret: "",
       redirectUrl: "http://localhost:9000/",
+      kayakStravaUrl: "http://localhost:5000",
     };
     const resp = { data: config };
     (axios.get as jest.Mock).mockResolvedValue(resp);
@@ -32,8 +32,8 @@ describe("Service Config", () => {
     const config: ServiceConfig = {
       stravaUrl: "",
       clientId: "58115",
-      clientSecret: "",
       redirectUrl: "http://localhost:9000/",
+      kayakStravaUrl: "http://localhost:5000",
     };
     const resp = { data: config };
     (axios.get as jest.Mock).mockResolvedValue(resp);
@@ -50,18 +50,18 @@ describe("Service Config", () => {
       const config: ServiceConfig = {
         stravaUrl: "http://strava.com",
         clientId: "58115",
-        clientSecret: "",
         redirectUrl: "http://localhost:9000/",
+        kayakStravaUrl: "http://localhost:5000",
       };
       const retVal: Token = {
         access_token: "123123",
         refresh_token: "456456",
-        expiry: new Date(),
+        expiry: 0,
         athlete: { firstname: "Greg", lastname: "Akins" } as Athlete,
       };
       const resp = { data: config };
       (axios.get as jest.Mock).mockResolvedValue(resp);
-      (axios.post as jest.Mock).mockResolvedValue({ data: retVal });
+      (axios.post as jest.Mock).mockResolvedValue({ data: { body: retVal } });
       delete window.location;
       window.location = { search: "?query=phone&code=gibberish" };
 
@@ -74,13 +74,13 @@ describe("Service Config", () => {
       const config: ServiceConfig = {
         stravaUrl: "http://strava.com",
         clientId: "58115",
-        clientSecret: "",
         redirectUrl: "http://localhost:9000/",
+        kayakStravaUrl: "http://localhost:5000",
       };
       const retVal: Token = {
         access_token: "123123",
         refresh_token: "456456",
-        expiry: new Date(),
+        expiry: Math.floor(Date.now() / 1000 + 1),
         athlete: { firstname: "Greg", lastname: "Akins" } as Athlete,
       };
       const resp = { data: config };
@@ -91,9 +91,9 @@ describe("Service Config", () => {
         value: `token=${JSON.stringify(retVal)}`,
       });
 
-      (axios.post as jest.Mock).mockResolvedValue({ data: retVal });
+      (axios.post as jest.Mock).mockResolvedValue({ data: { body: retVal } });
 
-      const data = await refreshAuth();
+      const data = await refreshStravaAuth();
       expect(data.refresh_token).toBe("456456");
     });
   });
